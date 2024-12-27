@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "284345892163",
+    "project_id": "lullaby-register",
+    "storage_bucket": "lullaby-register.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:284345892163:android:06bdbda6b61dfd95ffc3f6",
+        "android_client_info": {
+          "package_name": "com.example.lullaby"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZkS93mKwihHuyGPLOJZVVx_82eQjTFHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
