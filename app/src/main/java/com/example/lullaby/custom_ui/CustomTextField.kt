@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.lullaby.ui.theme.BlurredContainer
 import com.example.lullaby.ui.theme.BlurredWhite
 import com.example.lullaby.ui.theme.SofiaPro
@@ -19,10 +18,12 @@ fun CustomTextField(
     text: String,
     placeholder: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier // Allow external modifier to customize layout
+    modifier: Modifier = Modifier,
+    singleLine: Boolean = false,
+    maxLines: Int = 1
 ) {
     TextField(
-        modifier = modifier.fillMaxWidth(), // Apply the passed modifier and ensure full width
+        modifier = modifier.fillMaxWidth(),
         placeholder = {
             Text(
                 text = placeholder,
@@ -42,6 +43,8 @@ fun CustomTextField(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent
         ),
-        shape = RectangleShape
+        shape = RectangleShape,
+        singleLine = singleLine,
+        maxLines = maxLines
     )
 }
