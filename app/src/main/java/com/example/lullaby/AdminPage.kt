@@ -2,6 +2,7 @@ package com.example.lullaby
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -56,7 +60,6 @@ import com.example.lullaby.ui.theme.TitleYellow
 
 @SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun AdminPage(modifier: Modifier = Modifier) {
     val albumName = remember {
@@ -80,6 +83,10 @@ fun AdminPage(modifier: Modifier = Modifier) {
 
     val openTheDialog = remember {
         mutableStateOf(false)
+    }
+
+    val errorMessage = remember {
+        mutableStateOf("")
     }
 
     Scaffold(
@@ -112,15 +119,23 @@ fun AdminPage(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
             ) {
                 if(openTheDialog.value) {
                     AddingASongDialog(
                         openTheDialog = openTheDialog,
                         onAddSong = { song ->
-                            val newList: ArrayList<Song> = listOfSongs.value
-                            newList.add(song)
+                            val newSong = Song(
+                                title = song.title,
+                                artist = artist.value,
+                                featuringArtists = song.featuringArtists,
+                                albumName = albumName.value
+                            )
 
-                            listOfSongs.value = newList
+                            val updatedList: ArrayList<Song> = ArrayList(listOfSongs.value)
+                            updatedList.add(newSong)
+
+                            listOfSongs.value = updatedList
                         }
                     )
                 }
@@ -180,7 +195,16 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     },
                     modifier = Modifier
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                if(errorMessage.value.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = errorMessage.value,
+                        fontFamily = SofiaPro,
+                        fontSize = 14.sp,
+                        color = Color.Red
+                    )
+                }
+                Spacer(modifier = Modifier.height(30.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -192,7 +216,7 @@ fun AdminPage(modifier: Modifier = Modifier) {
                             fontFamily = SofiaPro,
                             textAlign = TextAlign.Left,
                             fontSize = 20.sp,
-                            color = BlurredWhite,
+                            color = Color.White.copy(0.8f),
                             fontWeight = FontWeight.Medium,
                         )
                         Spacer(modifier = Modifier.height(10.dp))
@@ -213,7 +237,17 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     ) {
                         IconButton(
                             onClick = {
-                                openTheDialog.value = true
+                                if(
+                                    albumName.value.isNotEmpty() &&
+                                    artist.value.isNotEmpty() &&
+                                    releaseYear.value.isNotEmpty() &&
+                                    albumCategory.value.isNotEmpty()
+                                ) {
+                                    openTheDialog.value = true
+                                    errorMessage.value = ""
+                                } else {
+                                    errorMessage.value = "Make sure to fill all the fields."
+                                }
                             },
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.Transparent,
@@ -228,11 +262,12 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 if(listOfSongs.value.isNotEmpty()) {
                     ColumnOfSongs(
-                        songs = listOfSongs
+                        songs = listOfSongs,
+                        modifier = Modifier.weight(1f)
                     )
                 } else {
                     Text(
@@ -243,6 +278,26 @@ fun AdminPage(modifier: Modifier = Modifier) {
                         fontSize = 28.sp
                     )
                 }
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                Button(
+                    onClick = {
+
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = TitleYellow
+                    )
+                ) {
+                    Text(
+                        text = "Add the album",
+                        fontFamily = SofiaPro,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = GlobalBackground
+                    )
+                }
+                Spacer(modifier = Modifier.height(50.dp))
             }
         }
     }
@@ -253,9 +308,12 @@ fun ColumnOfSongs(
     songs: MutableState<ArrayList<Song>>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn() {
-        items(songs.value) {song ->
+    LazyColumn(
+        modifier = modifier
+    ) {
+        itemsIndexed(songs.value) {index, song ->
             SongCard(
+                index = index + 1,
                 song = song
             )
         }

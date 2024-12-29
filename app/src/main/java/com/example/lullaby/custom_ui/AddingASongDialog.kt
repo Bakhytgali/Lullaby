@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.lullaby.data.Artist
 import com.example.lullaby.data.Song
 import com.example.lullaby.ui.theme.BlurredWhite
 import com.example.lullaby.ui.theme.SofiaPro
@@ -30,6 +31,14 @@ fun AddingASongDialog(
     onAddSong: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val name = remember {
+        mutableStateOf("")
+    }
+
+    val features = remember {
+        mutableStateOf("")
+    }
+
     AlertDialog(
         containerColor = Color.Black,
         onDismissRequest = {
@@ -38,7 +47,22 @@ fun AddingASongDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    openTheDialog.value = false
+
+                    if (
+                        name.value.isNotEmpty()
+                    ) {
+                        val featuresList = features.value.split(";")
+                        val featuredArtists: ArrayList<Artist> = createFeatures(featuresList)
+
+                        val newSong = Song(
+                            title = name.value,
+                            featuringArtists = featuredArtists
+                        )
+
+                        onAddSong(newSong)
+
+                        openTheDialog.value = false
+                    }
                 }
             ) {
                 Text(
@@ -77,19 +101,19 @@ fun AddingASongDialog(
         text = {
             Column {
                 CustomTextField(
-                    text = "Name",
+                    text = name.value,
                     placeholder = "Name",
                     onValueChange = {
-                        
+                        name.value = it
                     },
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
                 CustomTextField(
-                    text = "Features",
+                    text = features.value,
                     placeholder = "Features",
                     onValueChange = {
-                        
+                        features.value = it
                     },
                 )
                 Spacer(modifier = Modifier.height(15.dp))
@@ -104,4 +128,18 @@ fun AddingASongDialog(
             }
         }
     )
+}
+
+private fun createFeatures(featuresList: List<String>): ArrayList<Artist> {
+    if (featuresList.isEmpty()) {
+        return ArrayList()
+    }
+
+    val featuredArtists: ArrayList<Artist> = arrayListOf()
+
+    for (i in featuresList.indices) {
+        featuredArtists.add(Artist(featuresList[i]))
+    }
+
+    return featuredArtists
 }

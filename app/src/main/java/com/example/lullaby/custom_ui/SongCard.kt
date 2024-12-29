@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,14 +25,26 @@ import com.example.lullaby.ui.theme.SofiaPro
 
 @Composable
 fun SongCard(
+    index: Int,
     song: Song,
     modifier: Modifier = Modifier
 ) {
     val listOfFeatures: String = createFeatures(song.featuringArtists)
     Row(
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth()
             .padding(vertical = 10.dp)
     ) {
+        Text(
+            text = index.toString(),
+            fontSize = 18.sp,
+            fontFamily = SofiaPro,
+            color = Color.White.copy(0.85f)
+        )
+
+        Spacer(modifier = Modifier.width(15.dp))
+        
         Column(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
@@ -40,16 +53,16 @@ fun SongCard(
                 text = song.title.toString(),
                 fontFamily = SofiaPro,
                 fontSize = 18.sp,
-                color = BlurredWhite,
+                color = Color.White.copy(0.85f),
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-                text = "${song.artist}, $listOfFeatures",
+                text = "${song.artist}$listOfFeatures",
                 fontFamily = SofiaPro,
                 fontSize = 16.sp,
-                color = BlurredContainer
+                color = BlurredWhite
             )
         }
     }
@@ -60,10 +73,11 @@ private fun createFeatures(features: ArrayList<Artist>?): String{
 
     if (features != null) {
         for(i in features.indices) {
-            if(i == features.size - 1) {
-                featureArtists += "${features[i].name}"
-            } else {
-                featureArtists += "${features[i].name}, "
+            if(features[i].name == "") {
+                continue
+            }
+            else {
+                featureArtists += ", ${features[i].name}"
             }
         }
     } else {
@@ -82,5 +96,5 @@ private fun SongPreview() {
         arrayListOf(Artist("Justin Bieber"), Artist("Young Thug")),
         "Rodeo"
     )
-    SongCard(song)
+    SongCard(1, song)
 }
