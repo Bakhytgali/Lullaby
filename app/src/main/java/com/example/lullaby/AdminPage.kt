@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,8 +43,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lullaby.custom_ui.AddingASongDialog
 import com.example.lullaby.custom_ui.CustomTextField
 import com.example.lullaby.custom_ui.Logo
+import com.example.lullaby.custom_ui.SongCard
 import com.example.lullaby.data.Song
 import com.example.lullaby.ui.theme.BlurredContainer
 import com.example.lullaby.ui.theme.BlurredWhite
@@ -56,10 +59,27 @@ import com.example.lullaby.ui.theme.TitleYellow
 @Preview
 @Composable
 fun AdminPage(modifier: Modifier = Modifier) {
+    val albumName = remember {
+        mutableStateOf("")
+    }
+    val artist = remember {
+        mutableStateOf("")
+    }
+    val releaseYear = remember {
+        mutableStateOf("")
+    }
+    val albumCategory = remember {
+        mutableStateOf("")
+    }
+    
     val listOfSongs = remember {
         mutableStateOf(
             arrayListOf<Song>()
         )
+    }
+
+    val openTheDialog = remember {
+        mutableStateOf(false)
     }
 
     Scaffold(
@@ -93,6 +113,17 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.8f)
                     .fillMaxHeight()
             ) {
+                if(openTheDialog.value) {
+                    AddingASongDialog(
+                        openTheDialog = openTheDialog,
+                        onAddSong = { song ->
+                            val newList: ArrayList<Song> = listOfSongs.value
+                            newList.add(song)
+
+                            listOfSongs.value = newList
+                        }
+                    )
+                }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "This is an Admin Page\n " +
@@ -115,37 +146,37 @@ fun AdminPage(modifier: Modifier = Modifier) {
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    text = "Album Name",
+                    text = albumName.value,
                     placeholder = "Album Name",
                     onValueChange = {
-                        // Todo
+                        albumName.value = it
                     },
                     modifier = Modifier
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    text = "Album Artist",
+                    text = artist.value,
                     placeholder = "Artist",
                     onValueChange = {
-                        // Todo
+                        artist.value = it
                     },
                     modifier = Modifier
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    text = "Album Release Year",
+                    text = releaseYear.value,
                     placeholder = "Album Release Year",
                     onValueChange = {
-                        // Todo
+                        releaseYear.value = it
                     },
                     modifier = Modifier
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CustomTextField(
-                    text = "Album Category",
+                    text = albumCategory.value,
                     placeholder = "Album Category",
                     onValueChange = {
-                        // Todo
+                        albumCategory.value = it
                     },
                     modifier = Modifier
                 )
@@ -182,7 +213,7 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     ) {
                         IconButton(
                             onClick = {
-                                // TODO
+                                openTheDialog.value = true
                             },
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.Transparent,
@@ -197,10 +228,36 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     }
                 }
 
-                LazyColumn() {
-                    
+                Spacer(modifier = Modifier.height(50.dp))
+
+                if(listOfSongs.value.isNotEmpty()) {
+                    ColumnOfSongs(
+                        songs = listOfSongs
+                    )
+                } else {
+                    Text(
+                        text = "No songs added",
+                        fontFamily = SofiaPro,
+                        fontWeight = FontWeight.Bold,
+                        color = BlurredContainer,
+                        fontSize = 28.sp
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ColumnOfSongs(
+    songs: MutableState<ArrayList<Song>>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn() {
+        items(songs.value) {song ->
+            SongCard(
+                song = song
+            )
         }
     }
 }

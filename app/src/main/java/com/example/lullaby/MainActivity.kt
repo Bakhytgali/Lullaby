@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.lullaby.navigation_data.AccountPageDataObject
+import com.example.lullaby.navigation_data.AdminScreenObject
 import com.example.lullaby.navigation_data.AlbumPageDataObject
 import com.example.lullaby.navigation_data.LogInScreenObject
 import com.example.lullaby.navigation_data.MainScreenDataObject
@@ -27,8 +28,12 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = LogInScreenObject
+                    startDestination = AdminScreenObject
                 ) {
+
+                    composable<AdminScreenObject> {
+                        AdminPage()
+                    }
 
                     composable<LogInScreenObject> {
                         LoginPage(
