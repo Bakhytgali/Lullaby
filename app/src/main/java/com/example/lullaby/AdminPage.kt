@@ -1,6 +1,7 @@
 package com.example.lullaby
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,17 +52,25 @@ import com.example.lullaby.custom_ui.AddingASongDialog
 import com.example.lullaby.custom_ui.CustomTextField
 import com.example.lullaby.custom_ui.Logo
 import com.example.lullaby.custom_ui.SongCard
+import com.example.lullaby.data.AlbumModel
+import com.example.lullaby.data.Artist
 import com.example.lullaby.data.Song
 import com.example.lullaby.ui.theme.BlurredContainer
 import com.example.lullaby.ui.theme.BlurredWhite
 import com.example.lullaby.ui.theme.GlobalBackground
 import com.example.lullaby.ui.theme.SofiaPro
 import com.example.lullaby.ui.theme.TitleYellow
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 @SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminPage(modifier: Modifier = Modifier) {
+
+    val fs = Firebase.firestore
+
     val albumName = remember {
         mutableStateOf("")
     }
@@ -74,7 +83,7 @@ fun AdminPage(modifier: Modifier = Modifier) {
     val albumCategory = remember {
         mutableStateOf("")
     }
-    
+
     val listOfSongs = remember {
         mutableStateOf(
             arrayListOf<Song>()
@@ -119,9 +128,8 @@ fun AdminPage(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState())
             ) {
-                if(openTheDialog.value) {
+                if (openTheDialog.value) {
                     AddingASongDialog(
                         openTheDialog = openTheDialog,
                         onAddSong = { song ->
@@ -195,7 +203,7 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     },
                     modifier = Modifier
                 )
-                if(errorMessage.value.isNotEmpty()) {
+                if (errorMessage.value.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = errorMessage.value,
@@ -237,7 +245,7 @@ fun AdminPage(modifier: Modifier = Modifier) {
                     ) {
                         IconButton(
                             onClick = {
-                                if(
+                                if (
                                     albumName.value.isNotEmpty() &&
                                     artist.value.isNotEmpty() &&
                                     releaseYear.value.isNotEmpty() &&
@@ -264,7 +272,7 @@ fun AdminPage(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if(listOfSongs.value.isNotEmpty()) {
+                if (listOfSongs.value.isNotEmpty()) {
                     ColumnOfSongs(
                         songs = listOfSongs,
                         modifier = Modifier.weight(1f)
@@ -283,7 +291,25 @@ fun AdminPage(modifier: Modifier = Modifier) {
 
                 Button(
                     onClick = {
+                        val newArtist = Artist(
+                            name = artist.value
+                        )
 
+                        val newAlbum = AlbumModel(
+                            title = albumName.value,
+                            artist = newArtist,
+                            releaseYear = releaseYear.value.toInt(),
+                            imgUrl = null,
+                            category = albumCategory.value,
+                            listOfSongs = listOfSongs.value
+                        )
+
+                        Log.d("My Log", "$newAlbum")
+
+                        addAlbum(
+                            album = newAlbum,
+                            fs = fs
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = TitleYellow
@@ -311,11 +337,24 @@ fun ColumnOfSongs(
     LazyColumn(
         modifier = modifier
     ) {
-        itemsIndexed(songs.value) {index, song ->
+        itemsIndexed(songs.value) { index, song ->
             SongCard(
                 index = index + 1,
                 song = song
             )
         }
     }
+}
+
+fun addAlbum(
+    album: AlbumModel,
+    fs: FirebaseFirestore
+) {
+    fs.collection("albums").add(album)
+        .addOnSuccessListener {
+            Log.d("My Tag", "ALBUM ADDED!")
+        }
+        .addOnFailureListener {error ->
+            Log.d("My Tag", "Oops! ${error.message}")
+        }
 }

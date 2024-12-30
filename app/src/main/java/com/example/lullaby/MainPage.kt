@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -61,6 +62,7 @@ fun MainPage(
     navData: MainScreenDataObject,
     onNavigateToAccount: (AccountPageDataObject) -> Unit,
 //    onNavigateToAnAlbum: (AlbumPageDataObject) -> Unit,
+    onNavigateToAdmin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val fs = Firebase.firestore
@@ -210,14 +212,23 @@ fun MainPage(
                             contentDescription = "Search Icon",
                             tint = TitleYellow
                         )
-
-                        if(isAdmin.value) {
-                            Text("ADMIN STATE IS REAL!")
-                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))
+
+                if(isAdmin.value) {
+                    TextButton(
+                        onClick = {
+                            onNavigateToAdmin()
+                        }
+                    ) {
+                        Text(
+                            text = "Go to Admin",
+                            fontSize = 24.sp
+                        )
+                    }
+                }
 
                 if (searchResult.value.isNotEmpty()) {
                     LazyColumn(

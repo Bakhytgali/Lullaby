@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = AdminScreenObject
+                    startDestination = LogInScreenObject
                 ) {
 
                     composable<AdminScreenObject> {
@@ -61,6 +61,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToAccount = { navAccountData ->
                                 navController.navigate(navAccountData)
                             },
+                            onNavigateToAdmin = {
+                                navController.navigate(AdminScreenObject)
+                            }
 //                            onNavigateToAnAlbum = { navAlbumData ->
 //                                navController.navigate(navAlbumData)
 //                            }
