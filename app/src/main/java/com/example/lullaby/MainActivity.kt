@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = LogInScreenObject
+                    startDestination = AdminScreenObject
                 ) {
 
                     composable<AdminScreenObject> {
